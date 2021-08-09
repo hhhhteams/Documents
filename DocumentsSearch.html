@@ -1,0 +1,403 @@
+﻿<script src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/Style%20Library/js/angular/Online/Documents/DocumentsSearch.js"></script>
+<script src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/Style%20Library/js/angular/Templates/HHHH-EditSharewebItem.js"></script>
+<script src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/Style%20Library/js/angular/Services/alasql.min.js"></script>
+
+<style>
+    .container-new td {
+        word-break: break-all !important;
+    }
+
+    .displayLabel {
+        display: none;
+    }
+
+
+    /*** for table use ***/
+    .page-content {
+        width: auto !important;
+        margin-right: 36px !important;
+        height: auto !important;
+        margin-left: -25px !important;
+    }
+
+    .for-lis {
+        display: inline-flex;
+        width: 100%;
+        padding: 5px;
+    }
+
+    .pt-0 {
+        padding-top: 0px !important;
+    }
+
+    .padLR {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .arrow_up {
+        margin-top: -4px;
+        cursor: pointer;
+        margin-left: 4px;
+    }
+
+    .arrow_down {
+        margin-top: 10px;
+        cursor: pointer;
+        margin-left: 4px;
+    }
+
+    .glyphicon {
+        right: auto !important;
+    }
+
+    .for-c0l {
+        background: #e7e3e3 !important;
+        border: 1px solid #fff;
+    }
+
+    .for-c02 {
+        background: #f7f5f5 !important;
+        border: 1px solid #fff;
+    }
+
+    .for-c03 {
+        background: #fff !important;
+        border: 1px solid #eee;
+    }
+
+    .tdrows {
+        border: 1px solid #f2f2f2 !important;
+    }
+
+    .project_active {
+        background: #cecccc !important;
+    }
+
+    .section-event .searchclear {
+        right: auto !important;
+        margin-left: -19px;
+        bottom: auto;
+        top: 11px !important;
+    }
+
+    .glyphicon_active {
+        right: auto !important;
+    }
+
+    .width-90 {
+        width: 90%;
+    }
+
+    .ml5 {
+        margin-left: 10px;
+    }
+
+    .ml20 {
+        margin-left: 28px;
+    }
+
+    .ml35 {
+        margin-left: 45px;
+    }
+
+    #pageTitle a {
+        display: none !important;
+    }
+
+    #contentRow {
+        padding-top: 0px !important;
+        margin-top: -15px;
+    }
+</style>
+<div class="" ng-controller="DocumentSearchController">
+    <div>
+        <h1 class="blue-clr">document-search </h1>
+    </div>
+    <div class="" ng-cloak>
+        <div class="panel-body">
+            <div ng-if="User == undefined" style="padding-left:33%;">
+                <p>
+                    <!--<strong>You are currently not logged in. In order to see all documents log in <a href="{{baseUrl}}/memberarea/Pages/Content/Redirect-documents.aspx">here</a></strong>-->
+                    <strong>
+                        <label ng-bind-html="GetColumnDetails('UserLogin') | trustedHTML"></label>.
+                        <label ng-bind-html="GetColumnDetails('DocumentLog') | trustedHTML"></label>
+                        <a href="{{baseUrl}}/memberarea/Pages/Content/Redirect-documents.aspx">
+                            <label ng-bind-html="GetColumnDetails('Here') | trustedHTML"></label>
+                        </a>
+                    </strong>
+                </p>
+            </div>
+            ​<span ng-show="filterGroups.length>0">
+                <div class="togglebox">
+                    <p>
+
+                        <!--<a class="toggler" style="text-decoration: none;">SmartSearch – Filters</a>-->
+                        <a class="toggler" style="text-decoration: none;"><label ng-bind-html="GetColumnDetails('SmartFilters') | trustedHTML"></label></a>
+                        <!--<span class="pull-right"><a target="_blank" ng-href="{{baseUrl}}/Documents/Forms/fullppage_folder_web.aspx">Go to ootb list</a></span>-->
+                        <span class="pull-right"><a target="_blank" ng-href="{{baseUrl}}/Documents/Forms/AllItems.aspx">  <label ng-bind-html="GetColumnDetails('Ootb') | trustedHTML"></label></a></span>
+                    </p>
+                    <div class="togglecontent" style="display: block;">
+                        <p>
+                            <div class="container">
+                                <div class="row">
+
+                                    <div ng-repeat="item in filterGroups" class="col-sm-3">
+                                        <div class="td-manage">
+                                            <fieldset>
+                                                <!-- <legend   ng-if="item != 'Document_Type'">{{item}}</legend> -->
+                                                <!-- <legend  ng-if="item == 'Document-Type'">Document Type</legend> -->
+
+
+                                                <legend ng-if="item != 'Activities' && item !='Document_Type'">{{item}}</legend>
+                                                <legend ng-if="item == 'Activities'">Types of Activities</legend>
+                                                <!--<legend ng-if="item == 'Topics'">Related Sectors</legend>-->
+                                                <legend ng-if="item == 'Document_Type'">Document Type</legend>
+
+
+                                                <div ng-if="filterItem.Group == item" ng-repeat="filterItem in filterItems" style="width:80%;">
+
+
+                                                    <span class="plus-icon" ng-if="filterItem.childs.length>0 && !filterItem.expanded" ng-click="loadMoreFilters(filterItem);">
+                                                        <img ng-src="{{baseUrl}}/SiteCollectionImages/ICONS/32/right-list-icon.png">
+                                                    </span>
+                                                    <span class="plus-icon" ng-if="filterItem.childs.length>0 && filterItem.expanded" ng-click="loadMoreFilters(filterItem);">
+                                                        <img ng-src="{{baseUrl}}/SiteCollectionImages/ICONS/32/list-icon.png">
+                                                    </span>
+                                                    <input type="checkbox" class="icon-input" ng-model="filterItem.Selected" ng-click="FilterDocuments(filterItem)" />
+                                                    {{filterItem.Title}}
+                                                    <ul id="id_{{filterItem.Id}}" style="display:none;" ng-if="filterItem.childs.length>0" class="subfilter">
+                                                        <li ng-repeat="child1 in filterItem.childs">
+
+                                                            <span class="plus-icon" ng-if="child1.childs.length>0 && !child1.expanded" ng-click="loadMoreFilters(child1);">
+                                                                <img ng-src="{{baseUrl}}/SiteCollectionImages/ICONS/32/right-list-icon.png">
+                                                            </span>
+                                                            <span class="plus-icon" ng-if="child1.childs.length>0 && child1.expanded" ng-click="loadMoreFilters(child1);">
+                                                                <img ng-src="{{baseUrl}}/SiteCollectionImages/ICONS/32/list-icon.png">
+                                                            </span>
+                                                            <input type="checkbox" class="icon-input" ng-model="child1.Selected" ng-click="FilterDocuments(child1)" />
+                                                            {{child1.Title}}
+                                                            <ul id="id_{{child1.Id}}" style="display:none;" class="subfilter">
+                                                                <li ng-repeat="child2 in child1.childs">
+                                                                    <input type="checkbox" style="margin-top: -2px;" ng-model="child2.Selected" ng-click="FilterDocuments(child2)" />
+                                                                    {{child2.Title}}
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </p>
+                    </div>
+                </div>
+            </span>
+
+
+            <div class="row Doc-align">
+
+                <!--<div class="col-sm-2">Search in all documents:</div>-->
+                <div class="col-sm-2">
+                    <label ng-bind-html="GetColumnDetails('SearchDocumentData') | trustedHTML">
+
+                    </label>
+                </div>
+                <div class="col-sm-5 PadR0 padL-0">
+                    <input id="searchinput" type="search" ng-model="search" placeholder="Search all..." class="form-control searchbox_height">
+                    <span ng-show="search.length>0" class="searchclear" ng-click="clearControl('searchinput')">X</span>
+                </div>
+                <!--<div class="col-sm-3 no-padding"> Showing {{filtered.length}} of {{AllDocuments.length}} Documents </div>-->
+                <div class="col-sm-3"> <label> <span ng-bind-html="GetColumnDetails('Showing') | trustedHTML"> </span> {{filtered.length}} </label> <label> <span ng-bind-html="GetColumnDetails('Of') | trustedHTML"> </span> {{AllDocuments.length}} </label> <label ng-bind-html="GetColumnDetails('Documents') | trustedHTML"></label> </div>
+                <!--<div class="col-sm-1 no-padding"> <a data-ng-click="ClearFilters()" class="hreflink pull-right">Clear All <img ng-src="/_layouts/images/delete.gif"></a> </div>-->
+                <div class="col-sm-1 no-padding clear-all"> <a data-ng-click="ClearFilters()" class="hreflink pull-right"><label ng-bind-html="GetColumnDetails('ClearAll') | trustedHTML"></label> <img ng-src="/_layouts/images/delete.gif"></a> </div>
+                <div class="col-sm-1 print-icon">
+                    <img class="pull-right" ng-src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/SiteCollectionImages/ICONS/24/icon_Printer.png" ng-click="printResults()" />
+                    <img class="pull-right" ng-src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/SiteCollectionImages/ICONS/24/icon_excel.png" ng-click="exportToExcelPopup()" />
+                </div>
+            </div>
+
+            <div id="table-wrapper" class="section-event pt-0">
+
+                <ul id="documents" class="table table-fixed table-hover" width="100%">
+
+                    <li class="for-lis">
+                        <div style="width:8%;" id="siteType">
+                            <div style="width:17%;" class="displayLabel">
+                                <label class="head">Site</label>
+                            </div>
+                            <div style="width:80%;" class="headcontainer">
+                                <select class="width-90 searchbox_height" id="ItemsiteType" ng-model="siteType" ng-change="selectSiteType(siteType)">
+                                    <option value="">All</option>
+                                    <option value={{item}} ng-repeat="item in ItemSiteType">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="width:2%;" class="display_hide"><div style="width:80%;"></div></div>
+                        <div style="width:2%;" class="display_hide"><div style="width:80%;"></div></div>
+
+                        <div style="width:36%;" id="searchName" class="display_hide">
+                            <div style="width:17%;" class="displayLabel">
+                                <label ng-bind-html="GetColumnDetails('FileLeafRef')"></label>
+                            </div>
+                            <div style="width:80%" class="headcontainer">
+                                <input type="text" id="searchName" placeholder="Search Name" class="width-90 searchbox_height" ng-model="searchName" />
+                                <span ng-show="searchName.length>0" class="searchclear" ng-click="clearControl('searchName')">X</span>
+                                <span class="{{orderBy=='FileLeafRef'&&!reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-up direction-arrow arrow_up" ng-click="sortBy('FileLeafRef', false)"></span>
+
+                                <span class="{{orderBy=='FileLeafRef'&&reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-down direction-arrow arrow_down" ng-click="sortBy('FileLeafRef', true)"></span>
+
+                            </div>
+                        </div>
+                        <div style="width:16%;" id="searchCreatedBy" class="display_hide">
+                            <div style="width:17%;" class="displayLabel">
+                                <label ng-bind-html="GetColumnDetails('CreatedBy')"></label>
+                            </div>
+                            <div style="width:80%;" class="headcontainer">
+                                <input type="text" id="searchcreatedby" placeholder="Created Date" class="width-90 searchbox_height" ng-model="searchcreatedby" />
+                                <span ng-show="searchcreatedby.length>0" class="searchclear" ng-click="clearControl('searchcreatedby')">X</span>
+                                <span class="{{orderBy=='Author'&&!reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-up direction-arrow arrow_up" ng-click="sortBy('Author', false)"></span>
+
+                                <span class="{{orderBy=='Author'&&reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-down direction-arrow arrow_down" ng-click="sortBy('Author', true)"></span>
+                            </div>
+                        </div>
+                        <div style="width:14%;" id="searchModified " class="display_hide">
+                            <!--<div style="width:17%;" class="displayLabel">
+                                <label ng-bind-html="GetColumnDetails('ModifiedBy')"></label>
+                            </div>
+                            <div style="width:80%;" class="headcontainer">
+                                <input type="text" id="searchmodifiedby" placeholder="Modified By" class="width-90 searchbox_height" ng-model="searchmodifiedby" />
+                                <span class="searchclear" ng-click="clearControl('searchmodifiedby')">X</span>
+                                <span class="{{orderBy=='Editor'&&!reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-up direction-arrow arrow_up" ng-click="sortBy('Editor', false)"></span>
+
+                                <span class="{{orderBy=='Editor'&&reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-down direction-arrow arrow_down" ng-click="sortBy('Editor', true)"></span>
+                            </div>-->
+                        </div>
+                        <div style="width:16%;" id="searchCreated" class="display_hide">
+                            <div style="width:17%;" class="displayLabel">
+                                <label ng-bind-html="GetColumnDetails('ModifiedDate')"></label>
+                            </div>
+                            <div style="width:80%;" class="headcontainer">
+                                <input type="text" id="searchModifieddate " placeholder="Modified Date" class="width-90 searchbox_height" ng-model="searchModifieddate" />
+                                <span ng-show="searchModifieddate.length>0" class="searchclear" ng-click="clearControl('searchModifieddate')">X</span>
+                                <span class="{{orderBy=='ModifiedDate'&&!reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-up direction-arrow arrow_up" ng-click="sortBy('ModifiedDate', false)"></span>
+
+                                <span class="{{orderBy=='ModifiedDate'&&reverse?'glyphicon_active':'glyphicon'}}  glyphicon-chevron-down direction-arrow arrow_down" ng-click="sortBy('ModifiedDate', true)"></span>
+                            </div>
+                        </div>
+                        <div style="width:2%;" class="display_hide"><div style="width:80%;"></div></div>
+                        <div style="width:2%;" class="display_hide"><div style="width:80%;"></div></div>
+                    </li>
+
+                    <div class="container-new">
+                        <li class="tdrows for-lis" ng-repeat="item in filtered = (FilteredDocuments | filter:search | orderBy:orderBy:reverse
+                                            | filter:{FileLeafRef:searchName}| filter:searchfilterediotr |filter:searchfilterauthore)">
+                            <!-- <td> {{item.siteType}}</td>-->
+                            <!-- <td ng-if="item.siteType=='sp'" class="P_icon"> SP</td> -->
+                            <div class="P_icon padLR" style="width:8%;">
+                                {{item.SiteIcon}}
+                            </div>
+
+                            <div class="display_hide padLR" style="width:2%;">
+                                <a target="_blank" ng-href="{{item.FileDirRef}}">
+                                    <img ng-src="/_layouts/15/images/folder.gif">
+                                </a>
+                            </div>
+                            <div class="display_hide padLR" style="width:2%;">
+                                <img ng-if="item.File_x0020_Type == 'pdf'" ng-src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/SiteCollectionImages/ICONS/24/icon_pdf_16.jpg"> <img ng-if="item.File_x0020_Type != 'flv' && item.File_x0020_Type != 'js' && item.File_x0020_Type != 'css' && item.File_x0020_Type != 'zip' && item.File_x0020_Type != 'aspx' && item.File_x0020_Type != 'mp4' && item.File_x0020_Type != 'pdf' && item.File_x0020_Type != 'jpg' && item.File_x0020_Type != 'png' && item.File_x0020_Type != 'gif'" ng-src="/_layouts/15/images/ic{{item.File_x0020_Type}}.png"> <img ng-if="item.File_x0020_Type == 'flv' || item.File_x0020_Type == 'js' || item.File_x0020_Type == 'css' || item.File_x0020_Type == 'zip' || item.File_x0020_Type == 'aspx' || item.File_x0020_Type == 'mp4' || item.File_x0020_Type == 'jpg' || item.File_x0020_Type == 'png' || item.File_x0020_Type == 'gif'" ng-src="/_layouts/15/images/icgen.gif?rev=23">
+                            </div>
+                          
+                            <div class="display_hide padLR" style="width:37%;"><p class="name"><a target="_blank" ng-href="{{item.EncodedAbsUrl}}?web=1" data-ng-bind="item.FileLeafRef">{{item.FileLeafRef}}</a></p></div>
+
+                            <div class="display_hide padLR" style="width:16%;">
+                                {{item.Created}}
+                                <span ng-repeat="created in item.AllCreatedimages " class="hreflink ng-scope ">
+                                    <a target="_blank" ng-href="{{SubSiteUrl}}/SitePages/TeamLeader-Dashboard.aspx?UserId={{created.UserId}}&Name={{created.Title}}">
+                                        <img ng-show="created.useimageurl != undefined" title="{{created.Title}} " class="img-round " src="{{created.useimageurl}} " />
+                                        <img ng-show="created.useimageurl == undefined" title="{{item.Author}} " class="img-round " src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/SiteCollectionImages/ICONS/32/icon_user.jpg " />
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="display_hide padLR" style="width:14%;">
+                                <!--{{item.Editor}}-->
+                            </div>
+                            <div class="display_hide padLR" style="width:15%;">
+                                {{item.Modified}}
+                                <span ng-repeat="modified in item.AllModifiedimages " class="hreflink ng-scope ">
+                                    <a target="_blank" ng-href="https://hhhhteams.sharepoint.com/sites/HHHHTeams/sp/SitePages/TeamLeader-Dashboard.aspx?UserId={{modified.UserId}}&Name={{modified.Title}}">
+                                        <img ng-show="modified.useimageurl != undefined" title="{{modified.Title}} " class="img-round " src="{{modified.useimageurl}} " />
+                                        <img ng-show="modified.useimageurl == undefined" title="{{item.Editor}} " class="img-round " src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/SiteCollectionImages/ICONS/32/icon_user.jpg " />
+                                    </a>
+                                </span>
+                            </div>
+
+                            <div class="icontype display_hide padLR" style="width:2%;">
+
+                                <a ng-if="item.siteType == item.siteType " class="hreflink" ng-click="editSharewebItem(item.Id, item.siteType, 'Document')">
+                                    <img ng-src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/_layouts/images/edititem.gif">
+                                </a>
+
+
+
+                            </div>
+                            <div class="icontype display_hide padLR" style="width:2%;"><a class="hreflink" title="Delete"> <img data-ng-click="removeItem(item)" ng-src="https://hhhhteams.sharepoint.com/sites/HHHHTeams/_layouts/images/delete.gif"> </a></div>
+                        </li>
+                    </div>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="exportToexcelpopupdata" class="modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <ng-form name="createContactForm" novalidate role="form">
+                    <div class="panel-title">
+                        <h3>
+
+                            <img style="width: 22px;" ng-if="Item.Attachments" ng-src="{{baseUrl}}/admin/Lists/Contacts/Attachments/{{Item.Id}}/ContactPicture.jpg" />
+                            Export To Excel
+                            <button type="button" class="close" ng-click="cancelexportToExcelPopup()" style="min-width: 10px;">&times;</button>
+                        </h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+
+                            <div ng-repeat="item in exportcolumns">
+                                <div class="col-sm-6">
+
+                                    <div class="col-sm-12 checkbox">
+                                        <label class="ng-binding">
+                                            <input id="chkCompareContact_{{item.Id}}" type="checkbox" ng-model="item.isChecked" name="chkContact" ng-click=checkexportcolumn(item) />
+
+
+                                            {{item.DisplayName}}
+                                        </label>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <div class="ItemInfo pull-right">
+
+                        </div>
+                        <span>
+                            <button type="button" class="btn btn-primary" ng-click="exportToExcel()">Save</button>
+                        </span>
+                        <span>
+                            <button type="button" class="btn btn-default" ng-click="cancelexportToExcelPopup()">Cancel</button>
+                        </span>
+                    </div>
+                </ng-form>
+            </div>
+        </div>
+    </div>
+</div>
